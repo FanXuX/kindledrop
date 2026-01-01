@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import SendForm from "./components/SendForm";
 import SendHistory from "./components/SendHistory";
 
@@ -52,23 +52,43 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="container mx-auto px-4 py-8">
-        <header className="mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">KindleDrop</h1>
-          <p className="text-lg text-gray-600">
-            Send GitHub files directly to your Kindle
-          </p>
-        </header>
+    <div className="container">
+      <div className="header-box">
+        <h1>Kindle-Drop!</h1>
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-1">
-            <SendForm onSuccess={handleSendSuccess} onError={handleSendError} />
-          </div>
-          <div className="lg:col-span-2">
-            <SendHistory submissions={submissions} />
-          </div>
+      <div
+        className="comic-frame"
+        ref={useRef<HTMLDivElement | null>(null)}
+        onMouseMove={(e) => {
+          const el = e.currentTarget as HTMLDivElement;
+          const rect = el.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          const centerX = rect.width / 2;
+          const centerY = rect.height / 2;
+          const rotateX = (y - centerY) / 50;
+          const rotateY = (centerX - x) / 50;
+          el.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) rotate(-1deg)`;
+        }}
+        onMouseLeave={(e) => {
+          const el = e.currentTarget as HTMLDivElement;
+          el.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) rotate(-1deg)`;
+        }}
+      >
+        <div className="halftone-lattice" />
+
+        <div className="form-content">
+          <SendForm onSuccess={handleSendSuccess} onError={handleSendError} />
         </div>
+
+        <div className="monologue">
+          "THE DATA MUST FLOW THROUGH THE PERFORATED GRID BEFORE THE INK DRIES!"
+        </div>
+      </div>
+
+      <div className="history-panel">
+        <SendHistory submissions={submissions} />
       </div>
     </div>
   );

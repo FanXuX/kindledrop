@@ -8,6 +8,7 @@ Important: do NOT commit secrets. Use a local `.env` file (gitignored) and load 
 
 Copy the example and fill in your SMTP values:
 
+```bash
 cd services/engine
 cp .env.example .env
 # edit .env and fill values

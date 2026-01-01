@@ -31,56 +31,47 @@ function formatTime(date: Date): string {
 export default function SendHistory({ submissions }: SendHistoryProps) {
   if (submissions.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow-lg p-8 text-center">
-        <p className="text-gray-500 text-lg">
-          No submissions yet. Send a file to get started!
-        </p>
+      <div className="history-empty">
+        <p>No submissions yet. Send a file to get started!</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-      <div className="px-6 py-4 border-b border-gray-200">
-        <h2 className="text-2xl font-bold text-gray-900">Recent Submissions</h2>
+    <div className="history-card">
+      <div className="history-header">
+        <h2>Recent Submissions</h2>
       </div>
-      <div className="divide-y divide-gray-200">
+      <div className="history-list">
         {submissions.map((sub) => (
-          <div key={sub.id} className="px-6 py-4 hover:bg-gray-50 transition">
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
+          <div key={sub.id} className="history-item">
+            <div className="history-row">
+              <div className="history-left">
+                <div
+                  className="flex items-center"
+                  style={{ display: "flex", alignItems: "center", gap: "8px" }}
+                >
                   <span
-                    className={`inline-block w-2 h-2 rounded-full ${
-                      sub.status === "success" ? "bg-green-500" : "bg-red-500"
+                    className={`status-dot ${
+                      sub.status === "success"
+                        ? "status-success"
+                        : "status-error"
                     }`}
                   />
-                  <h3 className="font-semibold text-gray-900">
+                  <span className="history-title">
                     {sub.fileName || "Unknown file"}
-                  </h3>
+                  </span>
                 </div>
-                {sub.url && (
-                  <p className="text-sm text-gray-600 mb-1 break-all">
-                    {sub.url}
-                  </p>
-                )}
+                {sub.url && <div className="history-url">{sub.url}</div>}
                 {sub.message && (
-                  <p
-                    className={`text-sm ${
-                      sub.status === "error" ? "text-red-600" : "text-gray-600"
-                    }`}
-                  >
-                    {sub.message}
-                  </p>
+                  <div className="history-message">{sub.message}</div>
                 )}
               </div>
-              <div className="text-right ml-4">
-                <p className="text-sm font-medium text-gray-600">
-                  {formatBytes(sub.bytes)}
-                </p>
-                <p className="text-xs text-gray-500">
+              <div className="history-meta">
+                <div>{formatBytes(sub.bytes)}</div>
+                <div style={{ fontSize: "0.85rem", marginTop: "4px" }}>
                   {formatTime(sub.timestamp)}
-                </p>
+                </div>
               </div>
             </div>
           </div>
