@@ -1,0 +1,7 @@
+{
+  "name": "kindledrop",
+  "private": true,
+  "workspaces": [
+    "apps/cli"
+  ]
+}

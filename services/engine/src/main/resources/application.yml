@@ -1,0 +1,16 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: kindledrop-engine
+  mail:
+    # These are overridden by CLI-provided settings at runtime, but defaults are here for local testing.
+    host: localhost
+    port: 25
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
