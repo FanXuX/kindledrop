@@ -73,3 +73,9 @@ temp/
 *.zip
 *.tar
 *.tar.gz
+
+############################
+# MCP
+############################
+tools/**/dist/
+tools/**/node_modules/

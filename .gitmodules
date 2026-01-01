@@ -1,0 +1,3 @@
+[submodule "tools/dev-mcp"]
+	path = tools/dev-mcp
+	url = git@github.com:FanXuX/dev-mcp.git

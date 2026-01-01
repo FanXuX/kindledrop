@@ -2,6 +2,7 @@
   "name": "kindledrop",
   "private": true,
   "workspaces": [
-    "apps/cli"
+    "apps/cli",
+    "apps/web"
   ]
 }

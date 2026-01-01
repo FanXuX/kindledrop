@@ -3,6 +3,7 @@
 Drop a GitHub link. Read it on your Kindle.
 
 KindleDrop is a **local-first** tool:
+
 - A TypeScript CLI (`stk`) for a nice terminal UX
 - A Spring Boot (Gradle) local engine for **secure downloading** + **SMTP sending**
 
@@ -113,6 +114,7 @@ Options:
 `POST /api/send`
 
 Request:
+
 ```json
 {
   "url": "https://github.com/org/repo/blob/main/path/book.pdf",
@@ -122,6 +124,7 @@ Request:
 ```
 
 Response:
+
 ```json
 {
   "ok": true,
@@ -147,6 +150,15 @@ Response:
 - If SMTP auth fails, verify:
   - `KINDLEDROP_SMTP_PASS` is set
   - your provider supports the chosen port + STARTTLS/SSL
+
+### Dev tooling (dev-mcp)
+
+After cloning:
+
+```
+git submodule update --init --recursive
+cd tools/dev-mcp && npm i && npm run build
+```
 
 ---
 
