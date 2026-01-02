@@ -1,14 +1,12 @@
-# Use an official OpenJDK runtime as a parent image
-FROM openjdk:25-ea-jdk-slim
+# Build stage
+FROM gradle:9-jdk21-noble AS build
+WORKDIR /home/gradle/src
+COPY --chown=gradle:gradle . .
+RUN gradle build --no-daemon
 
-# Set the working directory
+# Package stage
+FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
-
-# Copy the built jar file from the build context
-COPY build/libs/*.jar app.jar
-
-# Make port 8080 available to the world outside this container
+COPY --from=build /home/gradle/src/build/libs/*.jar app.jar
 EXPOSE 8080
-
-# Run the jar file
 ENTRYPOINT ["java","-jar","app.jar"]
