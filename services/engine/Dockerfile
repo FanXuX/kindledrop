@@ -2,6 +2,7 @@
 FROM gradle:9-jdk21-noble AS build
 WORKDIR /home/gradle/src
 COPY --chown=gradle:gradle . .
+RUN ls -la
 RUN gradle build --no-daemon
 
 # Package stage
