@@ -1,3 +1,4 @@
+// src/components/SendHistory.tsx
 interface Submission {
   id: string;
   url: string;
@@ -42,36 +43,36 @@ export default function SendHistory({ submissions }: SendHistoryProps) {
       <div className="history-header">
         <h2>Recent Submissions</h2>
       </div>
-      <div className="history-list">
+
+      <div className="history-list" role="list" aria-label="Recent submissions">
         {submissions.map((sub) => (
-          <div key={sub.id} className="history-item">
+          <div key={sub.id} className="history-item" role="listitem">
             <div className="history-row">
               <div className="history-left">
-                <div
-                  className="flex items-center"
-                  style={{ display: "flex", alignItems: "center", gap: "8px" }}
-                >
+                <div className="history-title-row">
                   <span
                     className={`status-dot ${
                       sub.status === "success"
                         ? "status-success"
                         : "status-error"
                     }`}
+                    aria-hidden="true"
                   />
                   <span className="history-title">
                     {sub.fileName || "Unknown file"}
                   </span>
                 </div>
+
                 {sub.url && <div className="history-url">{sub.url}</div>}
+
                 {sub.message && (
                   <div className="history-message">{sub.message}</div>
                 )}
               </div>
+
               <div className="history-meta">
                 <div>{formatBytes(sub.bytes)}</div>
-                <div style={{ fontSize: "0.85rem", marginTop: "4px" }}>
-                  {formatTime(sub.timestamp)}
-                </div>
+                <div className="history-time">{formatTime(sub.timestamp)}</div>
               </div>
             </div>
           </div>

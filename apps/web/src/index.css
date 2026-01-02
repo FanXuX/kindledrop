@@ -1,17 +1,33 @@
 @import url("https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&display=swap");
 
-/* Tailwind removed: using custom CSS only */
-
+/* =========================================================
+   Design Tokens
+   ========================================================= */
 :root {
   --ink: #121212;
   --paper: #fdfcf0;
   --cyan: #00aeef;
   --magenta: #ec008c;
   --yellow: #fff200;
+
   --border-width: 4px;
   --grain-strength: 0.12;
+
+  --shadow-1: 4px 4px 0 var(--ink);
+  --shadow-2: 8px 8px 0 var(--ink);
+  --shadow-3: 12px 12px 0 var(--ink);
+
+  /* Layout rhythm */
+  --gutter: 2rem;
+  --panel-gap: 3rem;
+
+  /* History max height (desktop) */
+  --history-max-h-desktop: 65vh;
 }
 
+/* =========================================================
+   Base / Reset
+   ========================================================= */
 * {
   box-sizing: border-box;
 }
@@ -27,96 +43,147 @@ body,
 body {
   font-family: "Space Mono", monospace;
   color: var(--ink);
-  background-color: var(--paper);
+  background: var(--paper);
   min-height: 100vh;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
+
+  padding: var(--gutter);
 }
 
 /* Noise Texture Overlay */
 body::before {
   content: "";
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   pointer-events: none;
   opacity: var(--grain-strength);
   z-index: 1000;
+
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
   mix-blend-mode: multiply;
 }
 
+/* =========================================================
+   App Shell Layout (NEW markup)
+   ========================================================= */
+.app {
+  width: 100%;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: var(--gutter);
+}
+
+.app__shell {
+  width: 100%;
+  max-width: 1200px;
+
+  position: relative;
+  z-index: 10;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 2rem;
+}
+
+/* ✅ App-wide header row (centered across form + history) */
+.app__header {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  z-index: 50;
+  margin-bottom: 0.5rem;
+}
+
+/* Panels center their content */
+.app__panel {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+/* Desktop: form + history side-by-side, both vertically centered */
+@media (min-width: 1025px) {
+  .app__shell {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: var(--panel-gap);
+    padding: 2.5rem;
+  }
+
+  /* ✅ header sits above BOTH panels */
+  .app__header {
+    position: absolute;
+    top: -18%; /* push header slightly above the panels */
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
+    pointer-events: none; /* avoids blocking hover effects */
+  }
+
+  .header-box--app {
+    pointer-events: auto;
+  }
+
+  .app__panel--form {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .app__panel--history {
+    flex: 1;
+    justify-content: center;
+    max-height: var(--history-max-h-desktop); /* scroll cap */
+  }
+}
+
+/* =========================================================
+   Decorative layers
+   ========================================================= */
 .halftone-lattice {
   position: absolute;
-  width: 100%;
-  height: 100%;
+  inset: 0;
+
   background-image: radial-gradient(var(--ink) 20%, transparent 20%);
   background-size: 6px 6px;
+
   mask-image: linear-gradient(
     to bottom right,
     rgba(0, 0, 0, 1),
     rgba(0, 0, 0, 0)
   );
+
   opacity: 0.12;
   pointer-events: none;
 }
 
-.container {
-  width: 100%;
-  max-width: 1200px;
-  position: relative;
-  z-index: 10;
-  margin: 0 auto;
-}
-
-/* Center the container vertically and horizontally */
-.container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-}
-
-/* Desktop: place form and history side-by-side */
-@media (min-width: 1025px) {
-  .container {
-    flex-direction: row;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 2rem;
-    padding: 3rem;
-  }
-
-  .comic-frame {
-    flex: 2;
-    max-width: 800px;
-    margin-top: 15% !important;
-  }
-  .history-panel {
-    flex: 2;
-    max-width: 800px;
-    margin-top: 15% !important;
-  }
-  .history-card {
-    margin-left: 0;
-  }
-}
-
+/* =========================================================
+   Comic frame
+   ========================================================= */
 .comic-frame {
   background: var(--paper);
   border: var(--border-width) solid var(--ink);
   position: relative;
-  padding: 3.5rem;
-  max-width: 920px;
-  margin: 0 auto;
-  box-shadow: 12px 12px 0px var(--ink);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  padding: 3.25rem;
+  width: 100%;
+  max-width: 760px;
+
+  box-shadow: var(--shadow-3);
   transform: rotate(-1deg);
   transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
   animation: slideUp 0.8s forwards;
 }
 
@@ -131,86 +198,64 @@ body::before {
   right: -24px;
   width: 100%;
   height: 100%;
+
   background-image: radial-gradient(var(--ink) 1.5px, transparent 0);
   background-size: 5px 5px;
+
   z-index: -1;
   opacity: 0.4;
 }
 
+/* =========================================================
+   Header box
+   ========================================================= */
 .header-box {
   background: var(--magenta);
   border: var(--border-width) solid var(--ink);
-  color: white;
-  padding: 0.5rem 1rem;
+  color: #fff;
+
+  padding: 0.55rem 1.1rem;
   display: inline-block;
-  position: absolute;
-  top: -0.5rem;
-  left: 50%;
-  transform: translateX(-50%) skew(-10deg);
-  box-shadow: 6px 6px 0px var(--ink);
-  z-index: 20;
+
+  box-shadow: 6px 6px 0 var(--ink);
+  z-index: 30;
+
+  max-width: 86%;
+  text-align: center;
 }
 
 .header-box h1 {
   font-family: "Anton", sans-serif;
-  font-size: 2.4rem;
+  font-size: 2.35rem;
   text-transform: uppercase;
   letter-spacing: 2px;
   line-height: 0.9;
   -webkit-text-stroke: 1px var(--ink);
 }
 
+/* ✅ App-level header variant (prevents overlapping the form) */
+.header-box--app {
+  position: relative !important;
+  top: 0 !important;
+  left: auto !important;
+  transform: skew(-10deg) !important;
+}
+
+/* =========================================================
+   Form
+   ========================================================= */
 .form-content {
-  margin-top: -1.5rem;
   width: 100%;
   max-width: 840px;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 0.5rem auto 0;
+
+  display: flex;
+  flex-direction: column;
 }
 
 .input-group {
-  margin-bottom: 1.5rem;
   position: relative;
-}
-
-.comic-frame .input-group::before {
-  top: -6px;
-}
-
-label {
-  display: block;
-  font-family: "Anton", sans-serif;
-  text-transform: uppercase;
-  font-size: 1rem;
-  margin: 0.5rem;
-  margin-bottom: 0.5rem;
-  letter-spacing: 1px;
-  position: relative;
-  z-index: 5;
-  color: var(--paper);
-  padding: 0 0.35rem;
-}
-
-input,
-textarea {
-  width: 100%;
-  padding: 1rem;
-  background: white;
-  border: var(--border-width) solid var(--ink);
-  font-family: "Space Mono", monospace;
-  font-weight: 700;
-  font-size: 1rem;
-  outline: none;
-  transition: all 0.2s ease;
-  position: relative;
-  z-index: 2;
-}
-
-input:focus,
-textarea:focus {
-  background: var(--yellow);
-  box-shadow: 6px 6px 0px var(--cyan);
-  transform: translate(-3px, -3px);
+  margin-bottom: 1.25rem;
 }
 
 .input-group::before {
@@ -224,55 +269,341 @@ textarea:focus {
   z-index: 1;
 }
 
-.btn-container {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 2rem;
+/* comic-style offset */
+.comic-frame .input-group::before {
+  top: -6px;
 }
 
+label {
+  display: block;
+  font-family: "Anton", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+
+  font-size: 1rem;
+  margin: 0.5rem;
+  margin-bottom: 0.5rem;
+
+  position: relative;
+  z-index: 5;
+
+  color: var(--paper);
+  padding: 0 0.35rem;
+}
+
+input,
+textarea {
+  width: 100%;
+  padding: 1rem;
+
+  background: #fff;
+  border: var(--border-width) solid var(--ink);
+
+  font-family: "Space Mono", monospace;
+  font-weight: 700;
+  font-size: 1rem;
+
+  outline: none;
+  transition: all 0.2s ease;
+  position: relative;
+  z-index: 2;
+}
+
+input:focus,
+textarea:focus {
+  background: var(--yellow);
+  box-shadow: 6px 6px 0 var(--cyan);
+  transform: translate(-3px, -3px);
+}
+
+/* =========================================================
+   Buttons (global)
+   ========================================================= */
 button {
   background: var(--cyan);
   border: var(--border-width) solid var(--ink);
+
   padding: 1rem 2rem;
   font-family: "Anton", sans-serif;
   font-size: 1.4rem;
+
   text-transform: uppercase;
-  color: white;
+  color: #fff;
+
   position: relative;
-  box-shadow: 8px 8px 0px var(--ink);
+  box-shadow: var(--shadow-2);
   transition: all 0.1s ease;
+
   -webkit-text-stroke: 1px var(--ink);
 }
 
 button:hover {
   transform: translate(2px, 2px);
-  box-shadow: 4px 4px 0px var(--ink);
+  box-shadow: var(--shadow-1);
   background: var(--magenta);
+  cursor: pointer;
 }
+
 button:active {
   transform: translate(8px, 8px);
   box-shadow: 0 0 0 var(--ink);
 }
 
+/* =========================================================
+   SendForm - remember / controls rows
+   ========================================================= */
+.sendform__remember-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+
+  margin-top: 0.25rem;
+  padding: 0.5rem 0.75rem;
+
+  background: rgba(255, 255, 255, 0.7);
+  border: 2px solid rgba(18, 18, 18, 0.35);
+  border-radius: 8px;
+
+  position: relative;
+  z-index: 20;
+}
+
+.sendform__remember-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--ink);
+  font-size: 0.95rem;
+}
+
+.sendform__remember-checkbox {
+  width: 16px;
+  height: 16px;
+}
+
+.sendform__remember-text {
+  color: var(--ink);
+}
+
+.sendform__clear-btn {
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  color: var(--magenta);
+
+  font-family: "Anton", sans-serif;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  padding: 4px 10px;
+  cursor: pointer;
+
+  box-shadow: 2px 2px 0 var(--ink);
+  transition: all 0.12s ease;
+
+  white-space: nowrap;
+}
+
+.sendform__clear-btn:hover {
+  background: var(--magenta);
+  color: #fff;
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 var(--ink);
+}
+
+.sendform__clear-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 0 var(--ink);
+}
+
+.sendform__clear-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.sendform__controls-row {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 0.75rem;
+}
+
+/* =========================================================
+   Monologue bubble
+   ========================================================= */
 .monologue {
   position: absolute;
   left: -120px;
   bottom: 40px;
+
   width: 150px;
-  background: white;
+  background: #fff;
   border: 2px solid var(--ink);
+
   padding: 10px;
   font-size: 0.75rem;
-  font-weight: bold;
+  font-weight: 700;
+
   transform: rotate(-5deg);
   display: none;
 }
+
 @media (min-width: 1200px) {
   .monologue {
     display: block;
   }
 }
 
+/* =========================================================
+   History panel
+   ========================================================= */
+.history-panel {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  transform: rotate(2deg);
+  max-height: 700px;
+}
+
+.history-card {
+  background: var(--paper);
+  border: var(--border-width) solid var(--ink);
+  border-radius: 6px;
+  box-shadow: var(--shadow-2);
+  overflow: hidden;
+
+  width: 100%;
+  max-width: 560px;
+
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.history-header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  flex: 0 0 auto;
+}
+
+.history-header h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.history-list {
+  flex: 1 1 auto;
+  overflow: auto;
+  max-height: 100%;
+  padding-bottom: 0.25rem;
+}
+
+.history-item {
+  padding: 1rem 1.5rem;
+}
+
+.history-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.history-left {
+  flex: 1;
+  min-width: 0;
+}
+
+.history-meta {
+  margin-left: 1rem;
+  text-align: right;
+  color: rgba(0, 0, 0, 0.55);
+  white-space: nowrap;
+}
+
+.history-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.history-empty {
+  width: 100%;
+  max-width: 560px;
+
+  background: var(--paper);
+  border: var(--border-width) solid var(--ink);
+  border-radius: 8px;
+  box-shadow: var(--shadow-2);
+  padding: 2rem;
+  text-align: center;
+}
+
+.history-empty p {
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 1rem;
+}
+
+.history-time {
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
+
+.status-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  margin-right: 0.5rem;
+}
+
+.status-success {
+  background: #22c55e;
+}
+.status-error {
+  background: #ef4444;
+}
+
+.history-title {
+  font-weight: 700;
+}
+
+.history-url {
+  color: rgba(0, 0, 0, 0.55);
+  font-size: 0.95rem;
+  word-break: break-all;
+  margin-top: 0.25rem;
+}
+
+.history-message {
+  font-size: 0.95rem;
+  margin-top: 0.25rem;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+/* =========================================================
+   Error box
+   ========================================================= */
+.error-box {
+  padding: 0.75rem;
+  background: rgba(255, 0, 0, 0.06);
+  border: 2px solid #7f1d1d;
+  border-radius: 8px;
+  margin-top: 1rem;
+}
+
+.error-text {
+  color: #7f1d1d;
+  font-size: 0.95rem;
+}
+
+/* =========================================================
+   Animations
+   ========================================================= */
 @keyframes slideUp {
   from {
     opacity: 0;
@@ -294,34 +625,24 @@ button:active {
   animation-delay: 0.18s;
 }
 
-.history-panel {
-  margin-top: 3rem;
-}
-
-/* Responsive adjustments */
+/* =========================================================
+   Responsive adjustments
+   ========================================================= */
 @media (max-width: 1024px) {
   :root {
     --border-width: 3px;
+    --history-max-h-desktop: 75vh;
   }
-  .container {
-    max-width: 860px;
-    padding: 1.5rem;
-  }
+
   .comic-frame {
     padding: 2.5rem;
     max-width: 760px;
   }
-  .form-content {
-    max-width: 680px;
-  }
-  .header-box {
-    top: -0.5rem;
-    left: 50%;
-    transform: translateX(-50%) skew(-8deg);
-  }
+
   .header-box h1 {
     font-size: 2rem;
   }
+
   .monologue {
     left: -100px;
     bottom: 20px;
@@ -331,139 +652,42 @@ button:active {
 @media (max-width: 640px) {
   :root {
     --border-width: 2px;
+    --gutter: 1rem;
   }
+
   body {
-    padding: 1rem;
+    padding: var(--gutter);
   }
-  .container {
-    max-width: 100%;
+
+  .app__shell {
+    gap: 1.5rem;
   }
+
   .comic-frame {
     padding: 1.25rem;
-    max-width: calc(100% - 2rem);
   }
-  .form-content {
-    max-width: 100%;
-    margin-top: -0.75rem;
-  }
-  .header-box {
-    top: 0.5rem;
-    left: 50%;
-    transform: translateX(-50%) skew(-8deg);
-  }
+
   .header-box h1 {
     font-size: 1.6rem;
   }
+
   label {
     font-size: 0.85rem;
     padding: 0 0.25rem;
   }
+
   input,
   textarea {
     padding: 0.75rem;
     font-size: 0.95rem;
   }
+
   button {
     font-size: 1rem;
     padding: 0.75rem 1.25rem;
   }
+
   .monologue {
     display: none;
   }
-  .history-card {
-    margin-top: 1rem;
-  }
-}
-
-/* Send history styles (replaces Tailwind utilities) */
-.history-empty {
-  background: var(--paper);
-  border: var(--border-width) solid var(--ink);
-  border-radius: 8px;
-  box-shadow: 8px 8px 0 var(--ink);
-  padding: 2rem;
-  text-align: center;
-}
-.history-empty p {
-  color: rgba(0, 0, 0, 0.6);
-  font-size: 1rem;
-}
-
-.history-card {
-  background: var(--paper);
-  border: var(--border-width) solid var(--ink);
-  border-radius: 6px;
-  box-shadow: 8px 8px 0 var(--ink);
-  overflow: hidden;
-}
-.history-header {
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-}
-.history-header h2 {
-  font-size: 1.25rem;
-  font-weight: 700;
-}
-.history-list {
-  border-top: none;
-}
-.history-item {
-  padding: 1rem 1.5rem;
-  transition: background 0.12s ease;
-}
-.history-item:hover {
-  background: rgba(0, 0, 0, 0.02);
-}
-.history-row {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-}
-.history-left {
-  flex: 1;
-}
-.status-dot {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  margin-right: 0.5rem;
-}
-.status-success {
-  background: #22c55e;
-}
-.status-error {
-  background: #ef4444;
-}
-.history-title {
-  font-weight: 700;
-}
-.history-url {
-  color: rgba(0, 0, 0, 0.55);
-  font-size: 0.95rem;
-  word-break: break-all;
-  margin-top: 0.25rem;
-}
-.history-message {
-  font-size: 0.95rem;
-  margin-top: 0.25rem;
-  color: rgba(0, 0, 0, 0.6);
-}
-.history-meta {
-  margin-left: 1rem;
-  text-align: right;
-  color: rgba(0, 0, 0, 0.55);
-}
-
-/* Error box for SendForm */
-.error-box {
-  padding: 0.75rem;
-  background: rgba(255, 0, 0, 0.06);
-  border: 2px solid #7f1d1d;
-  border-radius: 8px;
-  margin-top: 1rem;
-}
-.error-text {
-  color: #7f1d1d;
-  font-size: 0.95rem;
 }

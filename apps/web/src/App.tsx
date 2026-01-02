@@ -1,19 +1,20 @@
-import { useState, useRef } from "react";
+import { useRef, useState } from "react";
 import SendForm from "./components/SendForm";
 import SendHistory from "./components/SendHistory";
 
+type Submission = {
+  id: string;
+  url: string;
+  fileName: string;
+  bytes: number;
+  timestamp: Date;
+  status: "success" | "error";
+  message?: string;
+};
+
 export default function App() {
-  const [submissions, setSubmissions] = useState<
-    Array<{
-      id: string;
-      url: string;
-      fileName: string;
-      bytes: number;
-      timestamp: Date;
-      status: "success" | "error";
-      message?: string;
-    }>
-  >([]);
+  const [submissions, setSubmissions] = useState<Submission[]>([]);
+  const comicRef = useRef<HTMLDivElement | null>(null);
 
   const handleSendSuccess = (result: {
     ok: boolean;
@@ -22,7 +23,7 @@ export default function App() {
     bytes: number;
     message?: string;
   }) => {
-    setSubmissions([
+    setSubmissions((prev) => [
       {
         id: Date.now().toString(),
         url: result.resolvedUrl,
@@ -32,12 +33,12 @@ export default function App() {
         status: result.ok ? "success" : "error",
         message: result.message,
       },
-      ...submissions,
+      ...prev,
     ]);
   };
 
   const handleSendError = (error: string) => {
-    setSubmissions([
+    setSubmissions((prev) => [
       {
         id: Date.now().toString(),
         url: "",
@@ -47,49 +48,62 @@ export default function App() {
         status: "error",
         message: error,
       },
-      ...submissions,
+      ...prev,
     ]);
   };
 
   return (
-    <div className="container">
-      <div className="header-box">
-        <h1>Kindle-Drop!</h1>
-      </div>
-
-      <div
-        className="comic-frame"
-        ref={useRef<HTMLDivElement | null>(null)}
-        onMouseMove={(e) => {
-          const el = e.currentTarget as HTMLDivElement;
-          const rect = el.getBoundingClientRect();
-          const x = e.clientX - rect.left;
-          const y = e.clientY - rect.top;
-          const centerX = rect.width / 2;
-          const centerY = rect.height / 2;
-          const rotateX = (y - centerY) / 50;
-          const rotateY = (centerX - x) / 50;
-          el.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) rotate(-1deg)`;
-        }}
-        onMouseLeave={(e) => {
-          const el = e.currentTarget as HTMLDivElement;
-          el.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) rotate(-1deg)`;
-        }}
-      >
-        <div className="halftone-lattice" />
-
-        <div className="form-content">
-          <SendForm onSuccess={handleSendSuccess} onError={handleSendError} />
+    <main className="app">
+      <div className="app__shell">
+        {/* ✅ App-wide header (centered over form + history) */}
+        <div className="app__header">
+          <div className="header-box header-box--app">
+            <h1>Kindle-Drop!</h1>
+          </div>
         </div>
 
-        <div className="monologue">
-          "THE DATA MUST FLOW THROUGH THE PERFORATED GRID BEFORE THE INK DRIES!"
-        </div>
-      </div>
+        <section className="app__panel app__panel--form">
+          <div
+            className="comic-frame"
+            ref={comicRef}
+            onMouseMove={(e) => {
+              const el = e.currentTarget as HTMLDivElement;
+              const rect = el.getBoundingClientRect();
+              const x = e.clientX - rect.left;
+              const y = e.clientY - rect.top;
+              const centerX = rect.width / 2;
+              const centerY = rect.height / 2;
+              const rotateX = (y - centerY) / 50;
+              const rotateY = (centerX - x) / 50;
+              el.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) rotate(-1deg)`;
+            }}
+            onMouseLeave={(e) => {
+              const el = e.currentTarget as HTMLDivElement;
+              el.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) rotate(-1deg)`;
+            }}
+          >
+            <div className="halftone-lattice" />
 
-      <div className="history-panel">
-        <SendHistory submissions={submissions} />
+            <div className="form-content">
+              <SendForm
+                onSuccess={handleSendSuccess}
+                onError={handleSendError}
+              />
+            </div>
+
+            <div className="monologue">
+              "THE DATA MUST FLOW THROUGH THE PERFORATED GRID BEFORE THE INK
+              DRIES!"
+            </div>
+          </div>
+        </section>
+
+        <section className="app__panel app__panel--history">
+          <div className="history-panel">
+            <SendHistory submissions={submissions} />
+          </div>
+        </section>
       </div>
-    </div>
+    </main>
   );
 }
